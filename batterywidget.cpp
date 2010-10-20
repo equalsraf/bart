@@ -11,6 +11,8 @@ BatteryWidget::BatteryWidget(BartWidget *parent)
 
 	label->setText("Battery:");
 	content->setText("??");
+
+	updateWidget();
 }
 
 void BatteryWidget::parse()
