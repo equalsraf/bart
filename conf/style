@@ -1,0 +1,15 @@
+
+BartWidget {
+	background	: black;
+}
+
+BartWidget * {
+	color		: #cccccc;
+}
+
+NotifyWidget #content {
+	color		 : #70FFEC;
+}
+
+BatteryWidget * {
+}

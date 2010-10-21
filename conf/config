@@ -1,0 +1,5 @@
+%cmd /bin/hostname
+%i3pager
+%notify
+%battery
+%clock
