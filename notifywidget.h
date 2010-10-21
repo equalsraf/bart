@@ -64,7 +64,7 @@ signals:
 
 protected:
 	QAtomicInt version;
-
+	int clearCount;
 };
 
 

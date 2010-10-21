@@ -57,13 +57,29 @@ int NotifyWidget::Notify(const QString& app, uint replace, const QString& icon,
 		const QStringList& actions, const QMap<QString, QVariant> &hints,
 		int timeout) {
 
-	label->setText(app);
-	content->setText(summary);
-	
 	qDebug() << app << summary << body << icon << hints;
 
-	if (timeout) {
-		QTimer::singleShot(timeout, this, SLOT(clear()));
+	// Technically we don't support formatting tags
+	// but some clients are too lazy to check
+	label->setText(QString(app).replace("<br/>", " "));
+
+	// For some reasone several apps enjoy passing
+	// over an empty body while other just give the
+	// app name as summary
+	if ( !body.isEmpty() ) {
+		content->setText(body);
+	} else {
+		content->setText(summary);
+	}
+
+	if (timeout > 0) {
+		// We dont respect the argument as passed over DBus
+		// but we will remove the notification ... eventually
+
+		connect(parent(), SIGNAL(timeout()),
+				this, SLOT(clear()));
+
+		clearCount = 2; // Wait 2 cycles before removing notification
 	}
 
 	return version.fetchAndStoreRelaxed(1);
@@ -71,8 +87,14 @@ int NotifyWidget::Notify(const QString& app, uint replace, const QString& icon,
 
 void NotifyWidget::clear()
 {
-	label->setText("");
-	content->setText("");
+	clearCount--;
+	if ( !clearCount ) {
+		label->setText("");
+		content->setText("");
+
+		disconnect(parent(), SIGNAL(timeout()),
+				this, SLOT(clear()));
+	}
 }
 
 
