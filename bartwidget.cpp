@@ -25,6 +25,13 @@ BartWidget::BartWidget(QWidget *parent)
 	      this, SIGNAL(timeout()) );
 
 	fromConfig();
+	loadStyle();
+
+	fsWatcher.addPath(configDirPath());
+
+	connect(&fsWatcher, SIGNAL(directoryChanged(QString )),
+			this, SLOT(configChanged(QString)));
+
 }
 
 void BartWidget::defaultConfig()
@@ -36,8 +43,11 @@ void BartWidget::defaultConfig()
 
 void BartWidget::fromConfig()
 {
-	
-	QFile f(QDir::home().absoluteFilePath(".bart/config"));
+
+	//
+	// Get config file
+	//
+	QFile f(configPath());
 
 	if (!f.open(QIODevice::ReadOnly | QIODevice::Text)) {
 		defaultConfig();
@@ -72,12 +82,54 @@ void BartWidget::fromConfig()
 		}
 
 	} while (!line.isEmpty());
+
 }
 
+
+void BartWidget::loadStyle()
+{
+	//
+	// Load style sheet
+	//
+	QFile f2(stylePath());
+	if (f2.open(QIODevice::ReadOnly | QIODevice::Text)) {
+
+		QTextStream styleIn(&f2);
+		QString style = styleIn.readAll();
+		f2.close();
+
+		setStyleSheet(style);
+	}
+
+	update();
+}
 
 void BartWidget::addWidget(QWidget *w)
 {
 	layout->addWidget( w );
 }
 
+void BartWidget::configChanged(const QString& path)
+{
+	if ( fsWatcher.directories().length() == 0 ) {
+		fsWatcher.addPath(configDirPath());
+	}
 
+	loadStyle();
+}
+
+QString BartWidget::configPath()
+{
+	return QDir::home().absoluteFilePath(".bart/config");
+}
+
+
+QString BartWidget::stylePath()
+{
+	return QDir::home().absoluteFilePath(".bart/style");
+}
+
+QString BartWidget::configDirPath()
+{
+	return QDir::home().absoluteFilePath(".bart/");
+}

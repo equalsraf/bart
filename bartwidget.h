@@ -13,12 +13,21 @@ public:
 signals:
 	void timeout();
 
-private:
+private slots:
 	void fromConfig();
+	void loadStyle();
+	void configChanged(const QString &path);
+
+private:
+
 	void defaultConfig();
+	static QString configPath();
+	static QString stylePath();
+	static QString configDirPath();
 
 	QLayout *layout;
 	QTimer *m_timer;
+	QFileSystemWatcher fsWatcher;
 
 };
 
