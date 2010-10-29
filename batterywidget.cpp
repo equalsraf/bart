@@ -20,8 +20,10 @@ void BatteryWidget::parse()
 
 	QFile f("/sys/class/power_supply/BAT0/uevent");
 
-	if (!f.open(QIODevice::ReadOnly | QIODevice::Text))
+	if (!f.open(QIODevice::ReadOnly | QIODevice::Text)) {
+		current = -1;
 		return;
+	}
 
 	QStringList args;
 	QByteArray line;
@@ -50,7 +52,11 @@ void BatteryWidget::parse()
 void BatteryWidget::updateWidget()
 {
 	parse();
-	content->setText( QString::number( (int)current) + "%" );
+	if ( current == -1 ) {
+		content->setText( "N/A" );
+	} else {
+		content->setText( QString::number( (int)current) + "%" );
+	}
 	update();
 }
 
